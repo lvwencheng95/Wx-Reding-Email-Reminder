@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
-# @Time : 2024/1/24
+# @Time : 2025/11/10
 # @Author : 52595
 # @File : wxReadingReminder.py
 # @Python Version : 3.7.4
 # @Software: PyCharm
 
-import re
-import json
-from prettytable import PrettyTable
-import pandas as pd
-import requests
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+from email.header import Header
+
 
 # 加载环境变量
 load_dotenv()
@@ -25,6 +21,7 @@ EMAIL_CONFIG = {
     'smtp_server': os.getenv('SMTP_SERVER', 'smtp.qq.com'),
     'smtp_port': int(os.getenv('SMTP_PORT', 587)),
     'sender_email': os.getenv('SENDER_EMAIL'),
+    # pifdgnckwiwddcff
     'sender_password': os.getenv('SENDER_PASSWORD'),
     'receiver_email': os.getenv('RECEIVER_EMAIL')
 }
@@ -33,7 +30,12 @@ EMAIL_CONFIG = {
 def send_email(subject, content):
     """发送邮件通知"""
     msg = MIMEMultipart()
-    msg['From'] = EMAIL_CONFIG['sender_email']
+    # 关键：正确设置From字段（中文别名+编码处理）
+    # 用Header处理中文别名，确保符合RFC2047编码标准
+    alias = Header('温馨提醒', 'utf-8').encode()  # 中文别名编码
+    sender_email = EMAIL_CONFIG['sender_email']
+    msg['From'] = f'{alias} <{sender_email}>'  # 格式：编码后的别名 <实际邮箱>
+    # msg['From'] = EMAIL_CONFIG['sender_email']
     msg['To'] = EMAIL_CONFIG['receiver_email']
     msg['Subject'] = subject
 
@@ -50,16 +52,18 @@ def send_email(subject, content):
     except Exception as e:
         print(f"邮件发送失败: {str(e)}")
 
+
 def main():
     # 邮件内容
     html_content = f"""
-    <h2>记得在微信读书读会书，别中途了</h2>
+    <h2>记得在微信读书读会书，别中途断了</h2>
     """
-    
+
     # 发送邮件
     # 设置邮件标题
     subject = f"微信读书365日挑战"
     send_email(subject, html_content)
+
 
 if __name__ == "__main__":
     main()
