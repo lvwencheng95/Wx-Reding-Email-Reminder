@@ -43,6 +43,7 @@ def send_email(subject, content):
         server = smtplib.SMTP(EMAIL_CONFIG['smtp_server'], EMAIL_CONFIG['smtp_port'])
         server.starttls()
         server.login(EMAIL_CONFIG['sender_email'], EMAIL_CONFIG['sender_password'])
+        print(EMAIL_CONFIG['smtp_server'], EMAIL_CONFIG['smtp_port'])
         server.send_message(msg)
         server.quit()
         print("邮件发送成功")
