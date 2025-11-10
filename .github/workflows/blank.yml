@@ -1,0 +1,23 @@
+name: Wx-Reading-Reminder
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+  schedule:
+    # UTC 时间 0 点运行一次, UTC为世界协调时，北京时间 = UTC + 8; 北京时间 17：27执行一次
+    - cron: '27 13 * * *'
+
+jobs:
+  build:
+
+    if: github.actor == github.repository_owner
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@main
+    - name: Run
+      uses: coactions/setup-xvfb@main
+      with:
+        run: dotnet run
+      env: 
+        CONF: ${{ secrets.CONF }}
