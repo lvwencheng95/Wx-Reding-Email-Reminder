@@ -1,0 +1,32 @@
+name: Wx-Reading-Reminder
+
+on:
+  schedule:
+    - cron: '45 13 * * *'  # UTC格式，我们需要的北京时间每天21:30运行
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests pandas prettytable python-dotenv
+    
+    - name: Run fund monitor
+      env:
+        SMTP_SERVER: smtp.qq.com
+        SMTP_PORT: 465
+        SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+        SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+        RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+      run: python wxReadingReminder.py
